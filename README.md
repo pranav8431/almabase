@@ -4,101 +4,115 @@
 - **Live app link:** `ADD_YOUR_LIVE_RENDER_URL_HERE`
 - **GitHub repository:** `ADD_YOUR_GITHUB_REPO_URL_HERE`
 
-## Overview
-This project is an end-to-end AI-powered questionnaire assistant with:
+## What I built
+An end-to-end AI-powered questionnaire assistant that supports:
 
-1. User signup/login (JWT authentication)
-2. Persistent database storage (SQLite locally, Postgres-ready via `DATABASE_URL`)
-3. Questionnaire upload (`.txt`) with auto-upload on file selection
-4. Answer generation from static company references
-5. Review and edit answers before export
-6. Export of answered questionnaire as downloadable document
-7. One-question ask mode (`/ask`) for quick Q&A
-8. Single-page UI where all non-auth functionality is visible only after sign-in
+1. User authentication (sign up and log in with JWT)
+2. Persistent storage of users and generated answers (SQLAlchemy + DB)
+3. Questionnaire upload and parsing into structured questions
+4. Retrieval + LLM-based grounded answer generation
+5. Citations attached to each generated answer
+6. Review/edit answers before final export
+7. Export as a downloadable document preserving question order/structure
+
+The app is fully functional as a complete workflow from upload to export.
+
+## Industry & fictional company (required)
+- **Industry chosen:** FinTech SaaS
+- **Fictional company:** **LedgerShield**
+
+LedgerShield provides compliance tooling for regulated finance teams. It helps teams respond to security and vendor due-diligence questionnaires using approved internal policy documents. The product focus is reliable, auditable responses with clear source references.
+
+## Assignment assets created
+- **Questionnaire (8–15 questions):** `backend/questionnaire.txt` (9 questions)
+- **Reference documents (3–8 docs):** `backend/reference_docs/`
+  - `Compliance.txt`
+  - `Data_Protection.txt`
+  - `Incident_Response.txt`
+  - `Infrastructure.txt`
+  - `Security_Policy.txt`
 
 ## Repository structure
-- `backend/` → FastAPI API, DB models, auth, RAG + LLM integration
-- `frontend/` → simple web UI (HTML/CSS/JS)
-- `project_guide/` → beginner-friendly walkthrough documents
+- `backend/` - FastAPI API, authentication, database, RAG, LLM integration
+- `frontend/` - Single-page web UI (HTML/CSS/JS)
 
-## Industry & fictional company
-- **Industry:** FinTech SaaS
-- **Company:** LedgerShield
-- LedgerShield helps regulated finance teams complete security and compliance questionnaires using approved internal policy documents.
+## How the system works
 
-## Created assignment assets
-- **Questionnaire:** `backend/questionnaire.txt` with 9 realistic questions (within required 8–15 range)
-- **Reference documents:** 5 source-of-truth files in `backend/reference_docs/` (within required 3–8 range)
+### Phase 1: Core workflow
+User flow:
+1. Sign up / log in
+2. Upload questionnaire document
+3. Generate answers
 
-## Assignment checklist mapping
-- **Authentication:** `POST /signup`, `POST /login`
-- **Persistent DB:** SQLAlchemy models (`users`, `answers`)
-- **Upload/store references requirement:** references are stored as static source-of-truth files and exposed via `GET /references`
-- **Upload to generate flow:** Upload questionnaire → parse questions → generate answers
-- **AI work:** Retrieval + grounded LLM answer generation
-- **Grounding with citations:** citations are returned with each generated answer; unsupported answers return `Not found in references.`
-- **Review & edit:** `GET /answers`, `PUT /answers/{answer_id}`
-- **Export document:** `GET /export` (downloadable `.txt` preserving original question order and question text, with answers + citations)
+System behavior:
+1. Parses uploaded questionnaire into individual questions
+2. Retrieves relevant passages from reference docs
+3. Generates one answer per question
+4. Adds citations for each supported answer
+5. Returns **`Not found in references.`** when evidence is missing
 
-## Phase 1 compliance (Core Workflow)
-- Sign up / log in from frontend
-- Upload questionnaire and generate answers
-- Structured web output includes **Question**, **Generated Answer**, and **Citation(s)**
+Web output includes:
+- Question
+- Generated answer
+- Citation(s)
 
-## Phase 2 compliance (Review & Export)
-- Review and edit generated answers before export (`Save Edit`)
-- Export downloadable document (`Export Document`) with:
-	- original structure/order preserved
-	- original question text unchanged
-	- answer inserted for each question
-	- citations included for each answer
+### Phase 2: Review & export
+After generation, user can:
+1. Review generated answers
+2. Edit answers
+3. Export final document
 
-## Frontend testing map (for evaluators)
-- **Sign up:** `Sign Up` button
-- **Sign in:** `Sign In` button
-- **Sign out:** `Sign Out` button
-- **Upload questionnaire:** choose a `.txt` file in file picker (auto-calls upload)
-- **Generate answers:** `Generate From Questionnaire`
-- **Review saved answers:** `Load Saved Answers`
-- **Edit answer:** update text and click `Save Edit`
-- **Export final document:** `Export Document`
-- **Ask one-off question:** enter text and click `Get Answer`
-- **Reload references list:** `Reload References`
+Export behavior:
+- Preserves original question order and structure
+- Keeps original question text unchanged
+- Inserts answer directly under each question
+- Includes citations with each answer
 
-## API flow
-1. `POST /signup`
-2. `POST /login`
-3. `POST /upload-questionnaire`
-4. `GET /references` (view static company reference files)
-5. `POST /generate`
-6. `GET /answers` and `PUT /answers/{answer_id}` for review/edit
-7. `GET /export` to download final document
-8. `POST /ask`
+## Required expectations checklist
+- ✅ Actual coding/scripting: FastAPI backend + frontend JS
+- ✅ Functional end-to-end system
+- ✅ User authentication
+- ✅ Persistent database storage
+- ✅ Clear upload → generate → review/edit → export flow
+- ✅ AI does meaningful work (retrieval + grounded generation)
+- ✅ Grounded outputs with citations
 
-## Nice-to-have features implemented
-1. Confidence score (`confidence`)
-2. Evidence snippets (`evidence_snippets`)
-3. Coverage summary in `/generate`
+## API endpoints (evaluator map)
+- `POST /signup` - register
+- `POST /login` - authenticate
+- `POST /upload-questionnaire` - upload questionnaire
+- `GET /references` - list stored reference documents
+- `POST /generate` - generate answers from questionnaire
+- `GET /answers` - load saved answers
+- `PUT /answers/{answer_id}` - edit/save answer
+- `POST /ask` - one-off Q&A against references
+- `GET /export` - download final structured output document
+
+## Nice-to-have features implemented (2+)
+1. **Confidence score** (`confidence`)
+2. **Evidence snippets** (`evidence_snippets`)
+3. **Coverage summary** in generation response (total, answered, not-found)
 
 ## Assumptions
-- Questionnaire file is plain text (`.txt`) with one question per line.
-- Reference docs are static `.txt` files in `backend/reference_docs/`.
-- A sample questionnaire is included at `backend/questionnaire.txt`.
-- Non-auth sections are hidden until a user signs in.
+- Questionnaire input is currently plain-text format (`.txt`) with one question per line.
+- Reference documents are stored as static company source-of-truth files in `backend/reference_docs/`.
+- Users are authenticated before generation/edit/export actions.
+- If the LLM key is unavailable, unsupported content still safely falls back to `Not found in references.`
 
 ## Trade-offs
-- Simple and reliable local setup (SQLite) over advanced infra complexity.
-- Focused MVP architecture (single FastAPI app + simple frontend).
-- Text-only questionnaire input for assignment speed and clarity.
+- Chose a complete MVP workflow over broad file-format support (PDF/XLSX parsing deferred).
+- Kept architecture simple (single FastAPI service + lightweight frontend) for reliability and clarity.
+- Prioritized groundedness and reviewer control (citations + edit-before-export) over UI polish.
 
 ## What I would improve with more time
-- Add PDF/Excel questionnaire parsing.
-- Add version history of multiple generation runs.
-- Add tests (API + integration) and migrations (Alembic).
-- Add stronger validation and finer-grained role permissions.
+- Add robust PDF/XLSX parsing and template-preserving exports for more formats.
+- Add partial regeneration for selected questions.
+- Add version history and answer comparisons across runs.
+- Add automated tests and DB migrations (Alembic).
+- Improve citation quality scoring and evaluator diagnostics.
 
 ## Run locally
-1. Create/activate your virtual environment.
+1. Create/activate Python virtual environment.
 2. Install dependencies:
 	```bash
 	pip install -r backend/requirements.txt
@@ -118,15 +132,17 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 6. Open API docs: `http://127.0.0.1:8000/docs`
 
 ## Quick demo flow
-1. Sign up (or sign in if already registered).
-2. Select `backend/questionnaire.txt` in the questionnaire file picker.
-3. Click `Generate From Questionnaire`.
-4. Edit any generated answer and click `Save Edit`.
-5. Click `Export Document` and verify download.
-6. Ask one custom question in the ask section.
+1. Sign up or sign in.
+2. Upload the sample questionnaire (`backend/questionnaire.txt`) from UI.
+3. Click **Generate From Questionnaire**.
+4. Review/edit answers and save edits.
+5. Click **Export Document** to download the final output.
 
-## Free deployment (Render + Neon)
+## Deployment notes (Render + Neon)
 1. Push repo to GitHub.
-2. Create free Postgres on Neon.
-3. Deploy with `backend/render.yaml` (root dir: `backend`).
-4. Set env vars in Render: `SECRET_KEY`, `GROQ_API_KEY`, `DATABASE_URL`.
+2. Provision managed Postgres (e.g., Neon).
+3. Deploy using `backend/render.yaml`.
+4. Configure env vars in Render:
+	- `SECRET_KEY`
+	- `DATABASE_URL`
+	- `GROQ_API_KEY` (recommended for full LLM generation)
