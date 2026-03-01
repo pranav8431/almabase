@@ -1,0 +1,16 @@
+LedgerShield operates a multi-tenant architecture with strict logical data segregation.
+Each customer tenant is assigned a unique tenant identifier enforced at the application layer.
+Database queries include tenant-scoped controls to prevent cross-tenant data exposure.
+Production backups are executed automatically every 6 hours.
+A full encrypted backup is created once every 24 hours.
+Backup files are stored in AWS S3 with server-side encryption enabled.
+Primary backup storage is located in AWS region ap-south-1.
+Secondary backup copies are replicated to AWS region ap-southeast-1.
+Customer transactional data is retained for 7 years to support regulatory obligations.
+Operational logs containing customer identifiers are retained for 1 year.
+Upon contract termination, customer data enters a 30-day retrieval window.
+After the retrieval window, customer data is permanently deleted from active systems.
+Deleted data is removed from backup sets through scheduled backup lifecycle expiration.
+LedgerShield validates customer data isolation controls during quarterly security testing.
+No customer can access another customer’s records through user interfaces or APIs.
+Data export operations are limited to authenticated users within the requesting tenant.

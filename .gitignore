@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+
+# Environment variables
+.env
+backend/.env
+
+# Local runtime artifacts
+backend/app.db
+backend/uploads/
+backend/exports/
+
+# OS/editor
+.DS_Store
+.vscode/
+.idea/

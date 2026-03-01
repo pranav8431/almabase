@@ -1,0 +1,16 @@
+LedgerShield enforces multi-factor authentication for all employee and contractor accounts.
+MFA is mandatory for all production systems, administrative consoles, and VPN access.
+LedgerShield uses role-based access control to assign permissions based on job function.
+RBAC roles are reviewed quarterly by the Security and IT teams.
+Users are granted the least privilege required to perform approved responsibilities.
+Remote access to internal systems requires connection through the corporate VPN.
+VPN access is restricted to managed devices with endpoint protection enabled.
+All sensitive customer and system data at rest is encrypted using AES-256.
+Database storage volumes and object storage buckets use AES-256 encryption keys.
+All data in transit is protected with TLS 1.2 or higher.
+Insecure protocols and ciphers below TLS 1.2 are disabled across external services.
+LedgerShield performs external and internal penetration tests at least once per year.
+Critical and high-risk findings from penetration tests are tracked to remediation.
+Access logging is enabled for authentication events, privilege changes, and data access actions.
+Security logs are centrally aggregated and monitored by the security operations team.
+Access and security logs are retained for 365 days.

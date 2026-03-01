@@ -1,0 +1,16 @@
+LedgerShield hosts its production platform on Amazon Web Services (AWS).
+The primary production region is ap-south-1.
+Application services run in containerized workloads using Docker images.
+Container orchestration is managed through Kubernetes.
+Kubernetes worker nodes are distributed across multiple availability zones in ap-south-1.
+Infrastructure provisioning is controlled through approved infrastructure-as-code pipelines.
+System metrics and dashboards are monitored using Amazon CloudWatch.
+Application performance and alerting are managed using Datadog.
+Security event monitoring is performed with a centralized SIEM platform.
+LedgerShield commits to a monthly uptime availability SLA of 99.9%.
+Disaster recovery uses warm standby infrastructure in a secondary AWS region.
+Database backups and configuration artifacts are replicated to the disaster recovery region.
+Disaster recovery failover procedures are tested two times per year.
+The recovery time objective (RTO) is 4 hours.
+The recovery point objective (RPO) is 15 minutes.
+Incident commanders can trigger regional failover using documented runbooks.

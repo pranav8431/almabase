@@ -1,0 +1,16 @@
+LedgerShield follows a formal incident response lifecycle with defined stages.
+The stages are preparation, detection, triage, containment, eradication, recovery, and post-incident review.
+Security monitoring systems generate alerts continuously across production services.
+Potential incidents are triaged by the security team within 30 minutes of detection.
+Confirmed high-severity incidents are escalated immediately to the incident commander.
+Initial containment actions are initiated within 1 hour for high-severity incidents.
+Customers impacted by a confirmed security incident are notified within 24 hours.
+Regulatory notification obligations are assessed by legal and compliance teams during triage.
+LedgerShield has a dedicated security team responsible for incident response operations.
+The security team includes incident commanders, forensic analysts, and communications leads.
+All incident actions are logged in a centralized incident management platform.
+Evidence is preserved according to forensic handling procedures.
+A post-incident review is completed within 5 business days after incident closure.
+The post-incident review includes root cause analysis and control gap identification.
+Corrective actions are assigned owners, due dates, and verification criteria.
+Lessons learned are incorporated into runbooks, monitoring rules, and training updates.

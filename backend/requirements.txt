@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+sentence-transformers
+faiss-cpu
+numpy
+requests
+sqlalchemy
+psycopg2-binary
+bcrypt
+python-jose
+python-multipart
+python-dotenv

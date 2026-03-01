@@ -1,0 +1,17 @@
+LedgerShield maintains an active SOC 2 Type II attestation.
+The SOC 2 Type II scope includes security, availability, and confidentiality controls.
+LedgerShield maintains ISO 27001 certification for its information security management system.
+ISO 27001 control ownership is documented and reviewed by compliance management.
+An accredited third-party audit firm performs annual external audits.
+Audit findings are tracked in a formal corrective action register.
+Compliance policies are reviewed every 12 months.
+Material regulatory or business changes trigger out-of-cycle policy updates.
+All employees complete mandatory security awareness training during onboarding.
+All employees complete annual refresher security training.
+Engineering and operations personnel complete role-specific secure operations training.
+Training completion records are maintained in the learning management system.
+Vendors handling sensitive data are evaluated through a risk assessment process.
+Internal control testing is performed quarterly by the compliance and security teams.
+Executive leadership reviews compliance status reports every quarter.
+Non-compliance issues are assigned owners and remediation deadlines.
+

@@ -1,0 +1,12 @@
+1. Is multi-factor authentication required for all employee and contractor accounts?
+2. What is the retention period for access and security logs?
+3. How frequently are production backups executed?
+4. In which AWS regions are primary and secondary backups stored?
+5. Which cloud provider and primary region host LedgerShield production workloads?
+6. What are the documented RTO and RPO targets for disaster recovery?
+7. Does LedgerShield maintain SOC 2 Type II and ISO 27001 certifications?
+8. How often are compliance policies formally reviewed?
+9. What are the defined stages in the incident response lifecycle?
+10. Within what timeframe are impacted customers notified after a confirmed security incident?
+11. What vulnerability remediation SLA applies to medium-severity findings?
+12. How often does LedgerShield run phishing simulation campaigns for employees?

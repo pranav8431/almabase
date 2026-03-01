@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Questionnaire Answering Tool</title>
+  <link rel="stylesheet" href="/frontend/styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="header">
+      <h1>Company Questionnaire Bot</h1>
+      <p>Ask one question at a time using approved company references with grounded citations.</p>
+    </header>
+
+    <section class="card">
+      <h2>1) Authentication</h2>
+      <div class="session-bar">
+        <span id="sessionInfo" class="small">Not logged in</span>
+        <button id="logoutBtn" class="secondary" type="button" disabled>Logout</button>
+      </div>
+      <div class="grid two">
+        <div class="block">
+          <h3>Sign Up</h3>
+          <input id="signupEmail" placeholder="Email" />
+          <input id="signupPassword" type="password" placeholder="Password" />
+          <button id="signupBtn">Sign Up</button>
+        </div>
+        <div class="block">
+          <h3>Log In</h3>
+          <input id="loginEmail" placeholder="Email" />
+          <input id="loginPassword" type="password" placeholder="Password" />
+          <button id="loginBtn">Log In</button>
+        </div>
+      </div>
+      <p id="authStatus" class="status"></p>
+    </section>
+
+    <section class="card">
+      <h2>2) Company References (Static)</h2>
+      <p class="small">These are the approved internal reference documents used by the bot.</p>
+      <ul id="references" class="reference-list"></ul>
+    </section>
+
+    <section class="card">
+      <h2>3) Questionnaire Workflow</h2>
+      <label class="label" for="questionnaireFile">Upload questionnaire (.txt)</label>
+      <input id="questionnaireFile" type="file" accept=".txt" />
+      <div class="actions">
+        <button id="uploadQuestionnaireBtn">Upload Questionnaire</button>
+        <button id="generateBtn">Generate From Questionnaire</button>
+      </div>
+      <p id="uploadStatus" class="status"></p>
+      <p id="generateStatus" class="status"></p>
+      <div id="summary" class="summary"></div>
+    </section>
+
+    <section class="card">
+      <h2>4) Ready-Made Questions</h2>
+      <p class="small">Use these common prompts and copy them quickly.</p>
+      <div id="readyQuestions" class="ready-questions"></div>
+    </section>
+
+    <section class="card">
+      <h2>5) Ask a Question</h2>
+      <label class="label" for="questionInput">Type your question</label>
+      <textarea id="questionInput" placeholder="e.g. What is the retention period for security logs?"></textarea>
+      <div class="actions">
+        <button id="askBtn">Get Answer</button>
+      </div>
+      <p id="askStatus" class="status"></p>
+      <div id="askResult" class="answer-preview"></div>
+    </section>
+
+  </div>
+
+  <script src="/frontend/app.js"></script>
+</body>
+</html>
