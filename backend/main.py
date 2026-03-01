@@ -86,7 +86,10 @@ def get_questionnaire_path(user_id: int) -> Path:
 
 def build_reference_index() -> None:
 	docs_dir = resolve_reference_docs_dir()
-	rag = SimpleRAG(model_name="all-MiniLM-L6-v2")
+	rag_mode = os.getenv("RAG_MODE")
+	if not rag_mode:
+		rag_mode = "keyword" if os.getenv("RENDER") else "semantic"
+	rag = SimpleRAG(model_name="all-MiniLM-L6-v2", mode=rag_mode)
 	rag.load_documents(docs_dir)
 	rag.build_index()
 	app.state.rag = rag
