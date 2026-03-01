@@ -114,13 +114,19 @@ def get_questionnaire_path(user_id: int) -> Path:
 
 def build_reference_index() -> None:
 	docs_dir = resolve_reference_docs_dir()
-	rag_mode = os.getenv("RAG_MODE")
-	if not rag_mode:
-		rag_mode = "keyword" if os.getenv("RENDER") else "semantic"
+	rag_mode = (os.getenv("RAG_MODE") or "keyword").strip().lower()
 	rag = SimpleRAG(model_name="all-MiniLM-L6-v2", mode=rag_mode)
 	rag.load_documents(docs_dir)
 	rag.build_index()
 	app.state.rag = rag
+
+
+def get_rag() -> SimpleRAG:
+	rag: SimpleRAG | None = getattr(app.state, "rag", None)
+	if rag is None:
+		build_reference_index()
+		rag = app.state.rag
+	return rag
 
 
 def get_reference_filenames() -> List[str]:
@@ -131,7 +137,9 @@ def get_reference_filenames() -> List[str]:
 @app.on_event("startup")
 def startup_event() -> None:
 	Base.metadata.create_all(bind=engine)
-	build_reference_index()
+	app.state.rag = None
+	if os.getenv("WARMUP_RAG", "0") == "1":
+		build_reference_index()
 
 	groq_api_key = os.getenv("GROQ_API_KEY")
 	if not groq_api_key:
@@ -145,6 +153,11 @@ def startup_event() -> None:
 @app.get("/")
 def frontend() -> FileResponse:
 	return FileResponse(path=str(FRONTEND_PATH), media_type="text/html")
+
+
+@app.get("/health")
+def health() -> dict:
+	return {"status": "ok"}
 
 
 @app.get("/references")
@@ -219,7 +232,7 @@ def generate_answers(
 	entries = parse_questionnaire_entries(questionnaire_path)
 	if len(entries) != len(questions):
 		entries = [{"original": question, "normalized": question} for question in questions]
-	rag: SimpleRAG = app.state.rag
+	rag: SimpleRAG = get_rag()
 	llm: LLMGenerator | None = app.state.llm
 
 	db.query(Answer).filter(Answer.user_id == current_user.id).delete()
@@ -392,8 +405,8 @@ def ask_question(
 	if not question:
 		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Question cannot be empty")
 
-	rag: SimpleRAG = app.state.rag
-	llm: LLMGenerator = app.state.llm
+	rag: SimpleRAG = get_rag()
+	llm: LLMGenerator | None = app.state.llm
 	retrieved = rag.retrieve(question, k=3, threshold=0.35)
 
 	if not retrieved:
@@ -402,7 +415,10 @@ def ask_question(
 		evidence: List[str] = []
 		confidence = 0.0
 	else:
-		answer_text = llm.generate(question, retrieved)
+		if llm is None:
+			answer_text = "Not found in references."
+		else:
+			answer_text = llm.generate(question, retrieved)
 		citations = sorted({str(item["source"]) for item in retrieved if "source" in item})
 		evidence = [str(item["text"]) for item in retrieved[:2]]
 		confidence = round(float(retrieved[0].get("score", 0.0)), 4)
