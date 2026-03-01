@@ -1,5 +1,9 @@
 # Structured Questionnaire Answering Tool
 
+## Submission
+- **Live app link:** `ADD_YOUR_LIVE_RENDER_URL_HERE`
+- **GitHub repository:** `ADD_YOUR_GITHUB_REPO_URL_HERE`
+
 ## Overview
 This project is an end-to-end AI-powered questionnaire assistant with:
 
@@ -22,14 +26,32 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 - **Company:** LedgerShield
 - LedgerShield helps regulated finance teams complete security and compliance questionnaires using approved internal policy documents.
 
+## Created assignment assets
+- **Questionnaire:** `backend/questionnaire.txt` with 9 realistic questions (within required 8–15 range)
+- **Reference documents:** 5 source-of-truth files in `backend/reference_docs/` (within required 3–8 range)
+
 ## Assignment checklist mapping
 - **Authentication:** `POST /signup`, `POST /login`
 - **Persistent DB:** SQLAlchemy models (`users`, `answers`)
-- **Upload to generate flow:** Upload questionnaire → generate answers
+- **Upload/store references requirement:** references are stored as static source-of-truth files and exposed via `GET /references`
+- **Upload to generate flow:** Upload questionnaire → parse questions → generate answers
 - **AI work:** Retrieval + grounded LLM answer generation
-- **Grounding with citations:** citations are returned with each generated answer
+- **Grounding with citations:** citations are returned with each generated answer; unsupported answers return `Not found in references.`
 - **Review & edit:** `GET /answers`, `PUT /answers/{answer_id}`
-- **Export document:** `GET /export` (downloadable `.txt` preserving question order)
+- **Export document:** `GET /export` (downloadable `.txt` preserving original question order and question text, with answers + citations)
+
+## Phase 1 compliance (Core Workflow)
+- Sign up / log in from frontend
+- Upload questionnaire and generate answers
+- Structured web output includes **Question**, **Generated Answer**, and **Citation(s)**
+
+## Phase 2 compliance (Review & Export)
+- Review and edit generated answers before export (`Save Edit`)
+- Export downloadable document (`Export Document`) with:
+	- original structure/order preserved
+	- original question text unchanged
+	- answer inserted for each question
+	- citations included for each answer
 
 ## Frontend testing map (for evaluators)
 - **Sign up:** `Sign Up` button

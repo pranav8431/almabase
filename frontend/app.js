@@ -95,6 +95,7 @@ async function signup() {
   }
 
   try {
+    setStatus("authStatus", "Signing up...");
     const response = await fetch(`${api}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -107,7 +108,7 @@ async function signup() {
     setStatus("authStatus", `Signup successful. Logged in as ${data.email}`);
     await loadSavedAnswers();
   } catch (error) {
-    setStatus("authStatus", error.message, true);
+    setStatus("authStatus", error?.message || "Signup failed", true);
   }
 }
 
@@ -136,11 +137,12 @@ async function login() {
   }
 
   try {
+    setStatus("authStatus", "Signing in...");
     await loginWithCredentials(username, password);
     setStatus("authStatus", "Login successful. Token stored in browser.");
     await loadSavedAnswers();
   } catch (error) {
-    setStatus("authStatus", error.message, true);
+    setStatus("authStatus", error?.message || "Login failed", true);
   }
 }
 
