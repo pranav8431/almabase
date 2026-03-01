@@ -1,8 +1,8 @@
 # Structured Questionnaire Answering Tool
 
 ## Submission
-- **Live app link:** `ADD_YOUR_LIVE_RENDER_URL_HERE`
-- **GitHub repository:** `ADD_YOUR_GITHUB_REPO_URL_HERE`
+- **Live app link:** [`ADD_YOUR_LIVE_RENDER_URL_HERE`](https://almabase-27zc.onrender.com/)
+- **GitHub repository:** [`https://github.com/pranav8431/almabase`](https://github.com/pranav8431/almabase)
 
 ## What I built
 An end-to-end AI-powered questionnaire assistant that supports:
