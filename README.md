@@ -5,11 +5,12 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 
 1. User signup/login (JWT authentication)
 2. Persistent database storage (SQLite locally, Postgres-ready via `DATABASE_URL`)
-3. Questionnaire upload (`.txt`)
+3. Questionnaire upload (`.txt`) with auto-upload on file selection
 4. Answer generation from static company references
 5. Review and edit answers before export
 6. Export of answered questionnaire as downloadable document
 7. One-question ask mode (`/ask`) for quick Q&A
+8. Single-page UI where all non-auth functionality is visible only after sign-in
 
 ## Repository structure
 - `backend/` → FastAPI API, DB models, auth, RAG + LLM integration
@@ -30,6 +31,18 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 - **Review & edit:** `GET /answers`, `PUT /answers/{answer_id}`
 - **Export document:** `GET /export` (downloadable `.txt` preserving question order)
 
+## Frontend testing map (for evaluators)
+- **Sign up:** `Sign Up` button
+- **Sign in:** `Sign In` button
+- **Sign out:** `Sign Out` button
+- **Upload questionnaire:** choose a `.txt` file in file picker (auto-calls upload)
+- **Generate answers:** `Generate From Questionnaire`
+- **Review saved answers:** `Load Saved Answers`
+- **Edit answer:** update text and click `Save Edit`
+- **Export final document:** `Export Document`
+- **Ask one-off question:** enter text and click `Get Answer`
+- **Reload references list:** `Reload References`
+
 ## API flow
 1. `POST /signup`
 2. `POST /login`
@@ -49,6 +62,7 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 - Questionnaire file is plain text (`.txt`) with one question per line.
 - Reference docs are static `.txt` files in `backend/reference_docs/`.
 - A sample questionnaire is included at `backend/questionnaire.txt`.
+- Non-auth sections are hidden until a user signs in.
 
 ## Trade-offs
 - Simple and reliable local setup (SQLite) over advanced infra complexity.
@@ -80,6 +94,14 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 	```
 5. Open app: `http://127.0.0.1:8000/`
 6. Open API docs: `http://127.0.0.1:8000/docs`
+
+## Quick demo flow
+1. Sign up (or sign in if already registered).
+2. Select `backend/questionnaire.txt` in the questionnaire file picker.
+3. Click `Generate From Questionnaire`.
+4. Edit any generated answer and click `Save Edit`.
+5. Click `Export Document` and verify download.
+6. Ask one custom question in the ask section.
 
 ## Free deployment (Render + Neon)
 1. Push repo to GitHub.

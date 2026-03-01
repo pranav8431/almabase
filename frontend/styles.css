@@ -58,8 +58,20 @@ body {
   margin-bottom: 14px;
 }
 
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1.55fr 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.side-stack {
+  display: grid;
+  gap: 14px;
+}
+
 h2 {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   font-size: 20px;
 }
 
@@ -123,6 +135,12 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+.status-group {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+}
+
 .top-actions {
   margin-top: 12px;
 }
@@ -138,13 +156,13 @@ button:disabled {
 }
 
 .summary {
-  margin-top: 10px;
+  margin-top: 8px;
   color: var(--muted);
   font-size: 14px;
 }
 
 .answer-preview {
-  margin-top: 10px;
+  margin-top: 8px;
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 12px;
@@ -158,6 +176,38 @@ button:disabled {
 .answer-preview ul {
   margin: 0;
   padding-left: 18px;
+}
+
+#generatedResults {
+  padding: 8px;
+}
+
+#generatedResults .generated-item {
+  padding: 8px;
+  gap: 6px;
+  border-radius: 8px;
+}
+
+#generatedResults .generated-item p {
+  margin: 0 0 4px;
+}
+
+#generatedResults .generated-item .label {
+  margin-bottom: 2px;
+  font-size: 12px;
+}
+
+#generatedResults .generated-item .compact-answer {
+  min-height: 56px;
+  padding: 7px;
+}
+
+#generatedResults .generated-item .actions {
+  margin-top: 2px;
+}
+
+#generatedResults .generated-item button {
+  padding: 7px 10px;
 }
 
 .label {
@@ -199,6 +249,10 @@ button:disabled {
 }
 
 @media (max-width: 780px) {
+  .layout-grid {
+    grid-template-columns: 1fr;
+  }
+
   .two {
     grid-template-columns: 1fr;
   }

@@ -10,10 +10,6 @@ const READY_QUESTIONS = [
 ];
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VIEW_HOME = "home";
-const VIEW_AUTH = "auth";
-const VIEW_WORKFLOW = "workflow";
-const VIEW_ASK = "ask";
 
 function setStatus(id, message, isError = false) {
   const element = document.getElementById(id);
@@ -26,42 +22,10 @@ function token() {
   return localStorage.getItem("access_token") || "";
 }
 
-function showView(view) {
-  const homePage = document.getElementById("homePage");
-  const authPage = document.getElementById("authPage");
-  const workflowPage = document.getElementById("workflowPage");
-  const askPage = document.getElementById("askPage");
-  if (!homePage || !authPage || !workflowPage || !askPage) return;
-
-  homePage.classList.toggle("hidden", view !== VIEW_HOME);
-  authPage.classList.toggle("hidden", view !== VIEW_AUTH);
-  workflowPage.classList.toggle("hidden", view !== VIEW_WORKFLOW);
-  askPage.classList.toggle("hidden", view !== VIEW_ASK);
-}
-
-function goHomePage() {
-  showView(VIEW_HOME);
-}
-
-function goToAuthPage() {
-  showView(VIEW_AUTH);
-}
-
 function ensureAuthenticated(statusId = "authStatus") {
   if (token()) return true;
-  showView(VIEW_AUTH);
   setStatus(statusId, "Please log in first.", true);
   return false;
-}
-
-function goToWorkflowPage() {
-  if (!ensureAuthenticated("authStatus")) return;
-  showView(VIEW_WORKFLOW);
-}
-
-function goToAskPage() {
-  if (!ensureAuthenticated("authStatus")) return;
-  showView(VIEW_ASK);
 }
 
 function setSessionUI() {
@@ -69,11 +33,15 @@ function setSessionUI() {
   const logoutBtn = document.getElementById("logoutBtn");
   const sessionInfo = document.getElementById("sessionInfo");
   const email = localStorage.getItem("session_email") || "";
+  const protectedSections = document.querySelectorAll(".auth-required");
 
   if (logoutBtn) logoutBtn.disabled = !hasToken;
   if (sessionInfo) {
     sessionInfo.textContent = hasToken ? `Logged in: ${email || "User"}` : "Not logged in";
   }
+  protectedSections.forEach((section) => {
+    section.classList.toggle("hidden", !hasToken);
+  });
 }
 
 function normalizeResult(item) {
@@ -108,12 +76,6 @@ function isValidEmail(value) {
   return EMAIL_PATTERN.test((value || "").trim());
 }
 
-function toggleSignupBlock() {
-  const signupBlock = document.getElementById("signupBlock");
-  if (!signupBlock) return;
-  signupBlock.classList.toggle("hidden");
-}
-
 async function parseResponse(response) {
   const contentType = response.headers.get("content-type") || "";
   if (contentType.includes("application/json")) {
@@ -144,7 +106,6 @@ async function signup() {
     await loginWithCredentials(email, password);
     setStatus("authStatus", `Signup successful. Logged in as ${data.email}`);
     await loadSavedAnswers();
-    showView(VIEW_WORKFLOW);
   } catch (error) {
     setStatus("authStatus", error.message, true);
   }
@@ -178,7 +139,6 @@ async function login() {
     await loginWithCredentials(username, password);
     setStatus("authStatus", "Login successful. Token stored in browser.");
     await loadSavedAnswers();
-    showView(VIEW_WORKFLOW);
   } catch (error) {
     setStatus("authStatus", error.message, true);
   }
@@ -193,7 +153,6 @@ function logout() {
   localStorage.removeItem("session_email");
   setSessionUI();
   setStatus("authStatus", "Logged out.");
-  goHomePage();
 }
 
 async function loadReferences() {
@@ -313,7 +272,7 @@ function renderGeneratedResults(results) {
   for (const item of results) {
     const result = normalizeResult(item);
     const card = document.createElement("div");
-    card.className = "block";
+    card.className = "block generated-item";
 
     const citations = result.citations.join(", ") || "None";
     const textareaId = `answer-edit-${result.id}`;
@@ -321,7 +280,7 @@ function renderGeneratedResults(results) {
     card.innerHTML = `
       <p><strong>Question:</strong> ${escapeHtml(result.question)}</p>
       <label class="label" for="${textareaId}">Review / Edit Answer</label>
-      <textarea id="${textareaId}">${escapeHtml(result.answer)}</textarea>
+      <textarea id="${textareaId}" class="compact-answer">${escapeHtml(result.answer)}</textarea>
       <p><strong>Citations:</strong> ${escapeHtml(citations)}</p>
       <div class="actions">
         <button type="button" data-save-id="${result.id}" data-textarea-id="${textareaId}">Save Edit</button>
@@ -464,7 +423,6 @@ function renderReadyQuestions() {
       const questionInput = document.getElementById("questionInput");
       if (questionInput) questionInput.value = question;
       setStatus("askStatus", "Question added to input.");
-      showView(VIEW_ASK);
     });
 
     container.appendChild(row);
@@ -472,26 +430,20 @@ function renderReadyQuestions() {
 }
 
 function bindEvents() {
-  document.getElementById("goHomeBtn")?.addEventListener("click", goHomePage);
-  document.getElementById("goToAuthBtn")?.addEventListener("click", goToAuthPage);
-  document.getElementById("goToWorkflowBtn")?.addEventListener("click", goToWorkflowPage);
-  document.getElementById("goToAskBtn")?.addEventListener("click", goToAskPage);
-  document.getElementById("goAuthFromHome")?.addEventListener("click", goToAuthPage);
-
-  document.getElementById("showSignupBtn")?.addEventListener("click", toggleSignupBlock);
   document.getElementById("signupBtn")?.addEventListener("click", signup);
   document.getElementById("loginBtn")?.addEventListener("click", login);
   document.getElementById("logoutBtn")?.addEventListener("click", logout);
 
-  document.getElementById("uploadQuestionnaireBtn")?.addEventListener("click", uploadQuestionnaire);
+  document.getElementById("questionnaireFile")?.addEventListener("change", uploadQuestionnaire);
   document.getElementById("generateBtn")?.addEventListener("click", generateFromQuestionnaire);
+  document.getElementById("loadAnswersBtn")?.addEventListener("click", loadSavedAnswers);
   document.getElementById("exportBtn")?.addEventListener("click", exportDocument);
   document.getElementById("askBtn")?.addEventListener("click", askQuestion);
+  document.getElementById("reloadReferencesBtn")?.addEventListener("click", loadReferences);
 }
 
 bindEvents();
 setSessionUI();
-showView(VIEW_HOME);
 loadReferences();
 renderReadyQuestions();
 loadSavedAnswers();
