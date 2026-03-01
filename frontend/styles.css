@@ -232,6 +232,22 @@ button:disabled {
   margin-bottom: 6px;
 }
 
+.references-card h2 {
+  margin-bottom: 6px;
+}
+
+.references-card .small {
+  margin: 0;
+}
+
+.references-card .reference-list {
+  margin-top: 6px;
+}
+
+.references-card .reference-list li {
+  margin-bottom: 4px;
+}
+
 .ready-questions {
   display: grid;
   gap: 10px;

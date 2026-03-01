@@ -54,12 +54,17 @@ class UpdateAnswerRequest(BaseModel):
 
 
 def resolve_reference_docs_dir() -> str:
-	candidates = ["reference_docs", "refrence_docs"]
-	for candidate in candidates:
-		if os.path.isdir(candidate):
-			return candidate
+	base_dir = Path(__file__).resolve().parent
+	search_roots = [Path.cwd(), base_dir, base_dir.parent]
+	candidate_names = ["reference_docs", "refrence_docs"]
+
+	for root in search_roots:
+		for name in candidate_names:
+			candidate = root / name
+			if candidate.is_dir():
+				return str(candidate)
 	raise FileNotFoundError(
-		"Could not find reference docs folder. Expected one of: reference_docs/, refrence_docs/"
+		"Could not find reference docs folder. Expected one of: reference_docs/, refrence_docs/ in cwd, backend/, or repo root."
 	)
 
 
@@ -130,7 +135,10 @@ def startup_event() -> None:
 
 	groq_api_key = os.getenv("GROQ_API_KEY")
 	if not groq_api_key:
-		raise ValueError("GROQ_API_KEY is not set.")
+		app.state.llm = None
+		print("[startup] GROQ_API_KEY is not set. LLM generation disabled; retrieval-only fallback enabled.")
+		return
+
 	app.state.llm = LLMGenerator(api_key=groq_api_key)
 
 
@@ -212,7 +220,7 @@ def generate_answers(
 	if len(entries) != len(questions):
 		entries = [{"original": question, "normalized": question} for question in questions]
 	rag: SimpleRAG = app.state.rag
-	llm: LLMGenerator = app.state.llm
+	llm: LLMGenerator | None = app.state.llm
 
 	db.query(Answer).filter(Answer.user_id == current_user.id).delete()
 
@@ -231,7 +239,10 @@ def generate_answers(
 			confidence = 0.0
 			not_found_count += 1
 		else:
-			answer_text = llm.generate(question, retrieved)
+			if llm is None:
+				answer_text = "Not found in references."
+			else:
+				answer_text = llm.generate(question, retrieved)
 			citations = sorted({str(item["source"]) for item in retrieved if "source" in item})
 			evidence = [str(item["text"]) for item in retrieved[:2]]
 			confidence = round(float(retrieved[0].get("score", 0.0)), 4)

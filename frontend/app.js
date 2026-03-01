@@ -441,7 +441,6 @@ function bindEvents() {
   document.getElementById("loadAnswersBtn")?.addEventListener("click", loadSavedAnswers);
   document.getElementById("exportBtn")?.addEventListener("click", exportDocument);
   document.getElementById("askBtn")?.addEventListener("click", askQuestion);
-  document.getElementById("reloadReferencesBtn")?.addEventListener("click", loadReferences);
 }
 
 bindEvents();
