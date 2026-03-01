@@ -7,7 +7,9 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 2. Persistent database storage (SQLite locally, Postgres-ready via `DATABASE_URL`)
 3. Questionnaire upload (`.txt`)
 4. Answer generation from static company references
-5. One-question ask mode (`/ask`) for quick Q&A
+5. Review and edit answers before export
+6. Export of answered questionnaire as downloadable document
+7. One-question ask mode (`/ask`) for quick Q&A
 
 ## Repository structure
 - `backend/` → FastAPI API, DB models, auth, RAG + LLM integration
@@ -25,6 +27,8 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 - **Upload to generate flow:** Upload questionnaire → generate answers
 - **AI work:** Retrieval + grounded LLM answer generation
 - **Grounding with citations:** citations are returned with each generated answer
+- **Review & edit:** `GET /answers`, `PUT /answers/{answer_id}`
+- **Export document:** `GET /export` (downloadable `.txt` preserving question order)
 
 ## API flow
 1. `POST /signup`
@@ -32,7 +36,9 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 3. `POST /upload-questionnaire`
 4. `GET /references` (view static company reference files)
 5. `POST /generate`
-6. `POST /ask`
+6. `GET /answers` and `PUT /answers/{answer_id}` for review/edit
+7. `GET /export` to download final document
+8. `POST /ask`
 
 ## Nice-to-have features implemented
 1. Confidence score (`confidence`)
@@ -42,6 +48,7 @@ This project is an end-to-end AI-powered questionnaire assistant with:
 ## Assumptions
 - Questionnaire file is plain text (`.txt`) with one question per line.
 - Reference docs are static `.txt` files in `backend/reference_docs/`.
+- A sample questionnaire is included at `backend/questionnaire.txt`.
 
 ## Trade-offs
 - Simple and reliable local setup (SQLite) over advanced infra complexity.

@@ -25,6 +25,10 @@ body {
   padding: 24px 16px 40px;
 }
 
+.hidden {
+  display: none;
+}
+
 .header {
   margin-bottom: 16px;
 }
@@ -117,6 +121,10 @@ button:disabled {
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+}
+
+.top-actions {
+  margin-top: 12px;
 }
 
 .status {

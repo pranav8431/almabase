@@ -11,67 +11,94 @@
     <header class="header">
       <h1>Company Questionnaire Bot</h1>
       <p>Ask one question at a time using approved company references with grounded citations.</p>
+      <div class="session-bar nav-wrap">
+        <div class="actions">
+          <button id="goHomeBtn" class="secondary" type="button">Home</button>
+          <button id="goToAuthBtn" class="secondary" type="button">Sign In</button>
+          <button id="goToWorkflowBtn" class="secondary" type="button">Questionnaire</button>
+          <button id="goToAskBtn" class="secondary" type="button">Ask</button>
+        </div>
+        <div class="actions">
+          <span id="sessionInfo" class="small">Not logged in</span>
+          <button id="logoutBtn" class="secondary" type="button" disabled>Sign Out</button>
+        </div>
+      </div>
     </header>
 
-    <section class="card">
-      <h2>1) Authentication</h2>
-      <div class="session-bar">
-        <span id="sessionInfo" class="small">Not logged in</span>
-        <button id="logoutBtn" class="secondary" type="button" disabled>Logout</button>
-      </div>
-      <div class="grid two">
-        <div class="block">
-          <h3>Sign Up</h3>
-          <input id="signupEmail" placeholder="Email" />
-          <input id="signupPassword" type="password" placeholder="Password" />
-          <button id="signupBtn">Sign Up</button>
+    <div id="homePage">
+      <section class="card">
+        <h2>Home</h2>
+        <p class="small">Please sign in to continue.</p>
+        <div class="actions top-actions">
+          <button id="goAuthFromHome" type="button">Go to Sign In</button>
         </div>
-        <div class="block">
-          <h3>Log In</h3>
-          <input id="loginEmail" placeholder="Email" />
-          <input id="loginPassword" type="password" placeholder="Password" />
-          <button id="loginBtn">Log In</button>
+      </section>
+    </div>
+
+    <div id="authPage" class="hidden">
+      <section class="card">
+        <h2>Authentication</h2>
+        <div class="grid two">
+          <div class="block">
+            <h3>Sign In</h3>
+            <input id="loginEmail" placeholder="Email" />
+            <input id="loginPassword" type="password" placeholder="Password" />
+            <button id="loginBtn">Sign In</button>
+            <button id="showSignupBtn" class="secondary" type="button">Need an account? Sign Up</button>
+          </div>
+          <div id="signupBlock" class="block hidden">
+            <h3>Sign Up</h3>
+            <input id="signupEmail" placeholder="Email" />
+            <input id="signupPassword" type="password" placeholder="Password" />
+            <button id="signupBtn">Sign Up</button>
+          </div>
         </div>
-      </div>
-      <p id="authStatus" class="status"></p>
-    </section>
+        <p id="authStatus" class="status"></p>
+      </section>
+    </div>
 
-    <section class="card">
-      <h2>2) Company References (Static)</h2>
-      <p class="small">These are the approved internal reference documents used by the bot.</p>
-      <ul id="references" class="reference-list"></ul>
-    </section>
+    <div id="workflowPage" class="hidden">
+      <section class="card">
+        <h2>Company References (Static)</h2>
+        <p class="small">These are the approved internal reference documents used by the bot.</p>
+        <ul id="references" class="reference-list"></ul>
+      </section>
 
-    <section class="card">
-      <h2>3) Questionnaire Workflow</h2>
-      <label class="label" for="questionnaireFile">Upload questionnaire (.txt)</label>
-      <input id="questionnaireFile" type="file" accept=".txt" />
-      <div class="actions">
-        <button id="uploadQuestionnaireBtn">Upload Questionnaire</button>
-        <button id="generateBtn">Generate From Questionnaire</button>
-      </div>
-      <p id="uploadStatus" class="status"></p>
-      <p id="generateStatus" class="status"></p>
-      <div id="summary" class="summary"></div>
-    </section>
+      <section class="card">
+        <h2>Questionnaire Workflow</h2>
+        <label class="label" for="questionnaireFile">Upload questionnaire (.txt)</label>
+        <input id="questionnaireFile" type="file" accept=".txt" />
+        <div class="actions">
+          <button id="uploadQuestionnaireBtn">Upload Questionnaire</button>
+          <button id="generateBtn">Generate From Questionnaire</button>
+          <button id="exportBtn" class="secondary" type="button">Export Document</button>
+        </div>
+        <p id="uploadStatus" class="status"></p>
+        <p id="generateStatus" class="status"></p>
+        <p id="exportStatus" class="status"></p>
+        <div id="summary" class="summary"></div>
+        <div id="generatedResults" class="answer-preview"></div>
+      </section>
+    </div>
 
-    <section class="card">
-      <h2>4) Ready-Made Questions</h2>
-      <p class="small">Use these common prompts and copy them quickly.</p>
-      <div id="readyQuestions" class="ready-questions"></div>
-    </section>
+    <div id="askPage" class="hidden">
+      <section class="card">
+        <h2>Ready-Made Questions</h2>
+        <p class="small">Use these common prompts and copy them quickly.</p>
+        <div id="readyQuestions" class="ready-questions"></div>
+      </section>
 
-    <section class="card">
-      <h2>5) Ask a Question</h2>
-      <label class="label" for="questionInput">Type your question</label>
-      <textarea id="questionInput" placeholder="e.g. What is the retention period for security logs?"></textarea>
-      <div class="actions">
-        <button id="askBtn">Get Answer</button>
-      </div>
-      <p id="askStatus" class="status"></p>
-      <div id="askResult" class="answer-preview"></div>
-    </section>
-
+      <section class="card">
+        <h2>Ask a Question</h2>
+        <label class="label" for="questionInput">Type your question</label>
+        <textarea id="questionInput" placeholder="e.g. What is the retention period for security logs?"></textarea>
+        <div class="actions">
+          <button id="askBtn">Get Answer</button>
+        </div>
+        <p id="askStatus" class="status"></p>
+        <div id="askResult" class="answer-preview"></div>
+      </section>
+    </div>
   </div>
 
   <script src="/frontend/app.js"></script>

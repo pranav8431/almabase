@@ -6,6 +6,7 @@ from typing import List
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, File, HTTPException, UploadFile, status
 from fastapi.responses import FileResponse
+from fastapi.responses import StreamingResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -48,6 +49,10 @@ class AskRequest(BaseModel):
 	question: str
 
 
+class UpdateAnswerRequest(BaseModel):
+	answer: str
+
+
 def resolve_reference_docs_dir() -> str:
 	candidates = ["reference_docs", "refrence_docs"]
 	for candidate in candidates:
@@ -78,6 +83,24 @@ def parse_questionnaire(file_path: Path) -> List[str]:
 	with file_path.open("r", encoding="utf-8") as file:
 		lines = file.readlines()
 	return parse_questions_from_lines(lines)
+
+
+def parse_questionnaire_entries(file_path: Path) -> List[dict]:
+	if not file_path.exists():
+		raise FileNotFoundError(f"Questionnaire file not found: {file_path}")
+
+	entries: List[dict] = []
+	with file_path.open("r", encoding="utf-8") as file:
+		for line in file.readlines():
+			original = line.rstrip("\n")
+			stripped = original.strip()
+			if not stripped:
+				continue
+			matched = QUESTION_PATTERN.match(stripped)
+			normalized = matched.group(1).strip() if matched else stripped
+			if normalized:
+				entries.append({"original": original, "normalized": normalized})
+	return entries
 
 
 def get_questionnaire_path(user_id: int) -> Path:
@@ -185,6 +208,9 @@ def generate_answers(
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questionnaire not uploaded")
 
 	questions = parse_questionnaire(questionnaire_path)
+	entries = parse_questionnaire_entries(questionnaire_path)
+	if len(entries) != len(questions):
+		entries = [{"original": question, "normalized": question} for question in questions]
 	rag: SimpleRAG = app.state.rag
 	llm: LLMGenerator = app.state.llm
 
@@ -194,7 +220,8 @@ def generate_answers(
 	covered_count = 0
 	not_found_count = 0
 
-	for question in questions:
+	for entry in entries:
+		question = str(entry["normalized"])
 		retrieved = rag.retrieve(question, k=3, threshold=0.35)
 
 		if not retrieved:
@@ -220,9 +247,11 @@ def generate_answers(
 			citation=", ".join(citations),
 		)
 		db.add(row)
+		db.flush()
 
 		results.append(
 			{
+				"id": row.id,
 				"question": question,
 				"answer": answer_text,
 				"citations": citations,
@@ -235,12 +264,111 @@ def generate_answers(
 
 	return {
 		"summary": {
-			"total_questions": len(questions),
+			"total_questions": len(entries),
 			"answered_with_citations": covered_count,
 			"not_found": not_found_count,
 		},
 		"results": results,
 	}
+
+
+@app.get("/answers")
+def list_answers(
+	db: Session = Depends(get_db),
+	current_user: User = Depends(get_current_user),
+) -> dict:
+	rows = (
+		db.query(Answer)
+		.filter(Answer.user_id == current_user.id)
+		.order_by(Answer.id.asc())
+		.all()
+	)
+
+	results = []
+	for row in rows:
+		citations = [item.strip() for item in (row.citation or "").split(",") if item.strip()]
+		results.append(
+			{
+				"id": row.id,
+				"question": row.question,
+				"answer": row.answer,
+				"citations": citations,
+			}
+		)
+
+	return {"results": results}
+
+
+@app.put("/answers/{answer_id}")
+def update_answer(
+	answer_id: int,
+	payload: UpdateAnswerRequest,
+	db: Session = Depends(get_db),
+	current_user: User = Depends(get_current_user),
+) -> dict:
+	row = (
+		db.query(Answer)
+		.filter(Answer.id == answer_id, Answer.user_id == current_user.id)
+		.first()
+	)
+	if not row:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Answer not found")
+
+	updated_answer = payload.answer.strip()
+	if not updated_answer:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Answer cannot be empty")
+
+	row.answer = updated_answer
+	db.commit()
+	db.refresh(row)
+
+	return {
+		"id": row.id,
+		"question": row.question,
+		"answer": row.answer,
+		"citations": [item.strip() for item in (row.citation or "").split(",") if item.strip()],
+	}
+
+
+@app.get("/export")
+def export_answers(
+	db: Session = Depends(get_db),
+	current_user: User = Depends(get_current_user),
+) -> StreamingResponse:
+	questionnaire_path = get_questionnaire_path(current_user.id)
+	if not questionnaire_path.exists():
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Questionnaire not uploaded")
+
+	entries = parse_questionnaire_entries(questionnaire_path)
+	if not entries:
+		raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="No questions found in questionnaire")
+
+	rows = (
+		db.query(Answer)
+		.filter(Answer.user_id == current_user.id)
+		.order_by(Answer.id.asc())
+		.all()
+	)
+	if not rows:
+		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No generated answers to export")
+
+	blocks: List[str] = []
+	for idx, entry in enumerate(entries):
+		question_line = str(entry["original"])
+		row = rows[idx] if idx < len(rows) else None
+		answer_text = row.answer if row else "Not found in references."
+		citation_text = row.citation if row and row.citation.strip() else "None"
+		blocks.append(
+			f"{question_line}\nAnswer: {answer_text}\nCitations: {citation_text}"
+		)
+
+	content = "\n\n".join(blocks)
+	filename = f"questionnaire_answers_user_{current_user.id}.txt"
+	return StreamingResponse(
+		iter([content]),
+		media_type="text/plain",
+		headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+	)
 
 
 @app.post("/ask")
