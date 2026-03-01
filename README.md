@@ -1,7 +1,7 @@
 # Structured Questionnaire Answering Tool
 
 ## Submission
-- **Live app link:** [`link`](https://almabase-27zc.onrender.com/)
+- **Live app link:** [`link`](https://almabase-27zc.onrender.com/) **This is deployed using free tier of vercel so it might around 1 min 10 sec to load -- if even after waiting it does not start open it in incognito**
 - **GitHub repository:** [`https://github.com/pranav8431/almabase`](https://github.com/pranav8431/almabase)
 
 ## What I built
